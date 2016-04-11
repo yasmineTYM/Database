@@ -1,0 +1,93 @@
+--编号，学生学号，学生姓名
+CREATE TABLE  [abo].[STUDENT] (
+[ID] [int]    IDENTITY(1,1)  NOT NULL,
+[SID] [nvarchar](20) PRIMARY  KEY  NOT NULL,
+[SNAME] [nvarchar] (50) NULL,
+);
+
+--编号，课程序号，课程代码，课程名称
+CREATE TABLE  [dbo].[COURSE] (
+[ID] [int]  IDENTITY(1,1)  NOT NULL,
+[CID][int] PRIMARY KEY NOT NULL,
+[CCODE][varchar](50)  NULL,
+[CNAME][nvarchar](50)  NULL,
+);
+
+--编号，课程学号，学生学号
+CREATE TABLE [dbo].[SELECT](
+[ID] [int]  IDENTITY(1,1) NOT NULL,
+[CID][int]  NOT NULL,
+[SID][int]  NOT NULL,
+PRIMARY  KEY( CID,SID)
+);
+    
+    
+    
+内容一：创建如下的存储过程
+输入课程序号，输出课程名称
+create procedure course_id_to_name
+@ID nchar(10)
+as
+begin
+select  CNAME  from COURSE where CID=@ID
+end
+
+输入学生学号，输出该学生的选课的数量
+create procedure course_count
+@ID nchar(10)
+as
+begin
+select COUNT(course_id)
+from SELECT
+where SID=@ID
+end
+
+增加一门课程信息，输入是课程代码、课程名称
+create procedure add_course
+@CID nchar（10）
+@CNAME nchar（10）
+as
+begin
+insert into COURSE(CID,CNAME) values（@CID,@CNAME）
+end
+
+
+输出恰巧选择三门课程的学生名单
+create procedure select_three_course
+as
+begin
+select SID
+from SELECT 
+group by SID
+having COUNT(CID)=3
+
+输出选修人数最多的课程的代码和名称
+create procedure most_popular_course
+as
+begin
+select CNAME,CID
+from COURSE
+where CID in ( select CID
+             from SELECT
+             group by CID
+             having COUNT(*)>=all( select COUNT(*)
+                                  from SELECT
+                                  group by CID)
+        以游标技术，列举出所有学生的名单，包括学生姓名、选择的课程的数量。
+Create procedure GetInfo
+as
+Begin 
+Declare CNAME CURSOR FAET_FORWARD
+For ( select distinct *
+     From STUDENT)
+Open CNAME
+Declare @SID varchar(10)
+       @SNAME nvarchar (10)
+       @CNUM int
+Declare @table table                                (                                  //建立了一个表记录课程
+        Name nvarcahr(10)           //名称和数量
+        CNUM int
+ )
+
+
+
