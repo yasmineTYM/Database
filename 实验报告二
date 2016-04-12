@@ -89,5 +89,48 @@ Declare @table table                                (                           
         CNUM int
  )
 
+⑦　加入一门新课程时，自动为所有学生选上该门课程
+Create trigger autoSelect
+On COURSE
+After insert
+As
+Begin
+Declare @CID nchar(10)
+Set @CID=(select CID from inserted)
+Insert into SELECT(SID,CID)
+Select SID,@CID from student
+End
 
+更改一门课程的课程号时，自动修改相应的选课记录的课程号。
+Create trigger autoUpdate
+On COURSE
+After update
+As
+If update(CID)
+   Begin
+     Update SELECT
+Set CID=(select CID
+         From COURSE
+         Where COURSE.CID=SELECT.CID)
+         end
+⑨　删除一个学生时，自动删除该学生的选课记录
+Create trigger delStudent
+On STUDENT
+After delete
+Delete from SELECT
+Where SID in( select SID from deleted)
+⑩　删除一条选课记录的时候，如果对应的课程号没有人选了，则删除该课程号。
+Create trigger deleteInfo
+On SELECT
+For delete
+As
+If exists(select count(CID),CID
+ From SELECT
+Group by CID
+Having count(CID)=0 )
+Begin
+Delete CID
+From COURSE
+Where COURSE.CID=SELECT.CID
+end      
 
